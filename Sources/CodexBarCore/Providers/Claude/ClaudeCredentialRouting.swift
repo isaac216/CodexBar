@@ -5,18 +5,51 @@ public enum ClaudeCredentialRouting: Sendable, Equatable {
     case oauth(accessToken: String)
     case webCookie(header: String)
     case adminAPIKey(String)
+    /// A token account without a pasted credential that signed in through its own Claude config directory. Usage
+    /// comes from Claude Code's CLI running with `CLAUDE_CONFIG_DIR` set to this normalized path.
+    case configDirectory(path: String)
 
     public static func resolve(tokenAccountToken: String?, manualCookieHeader: String?) -> Self {
+        self.resolve(
+            tokenAccountToken: tokenAccountToken,
+            claudeConfigDirectory: nil,
+            manualCookieHeader: manualCookieHeader)
+    }
+
+    /// A pasted credential keeps its route. Only an account whose credential field is blank uses its config
+    /// directory, so existing accounts that map a directory for local cost history keep their quota source.
+    public static func resolve(
+        tokenAccountToken: String?,
+        claudeConfigDirectory: String?,
+        manualCookieHeader: String?) -> Self
+    {
         if let tokenAccountToken,
            let route = self.resolvePrimaryCredential(tokenAccountToken)
         {
             return route
+        }
+        if self.cleaned(tokenAccountToken) == nil,
+           let directory = ClaudeAccountConfigDirectory.accountProfilePath(claudeConfigDirectory)
+        {
+            return .configDirectory(path: directory)
         }
 
         guard let manualCookieHeader = self.normalizedWebCookie(manualCookieHeader) else {
             return .none
         }
         return .webCookie(header: manualCookieHeader)
+    }
+
+    public static func resolve(account: ProviderTokenAccount) -> Self {
+        self.resolve(
+            tokenAccountToken: account.token,
+            claudeConfigDirectory: account.claudeConfigDirectory,
+            manualCookieHeader: nil)
+    }
+
+    public var configDirectory: String? {
+        guard case let .configDirectory(path) = self else { return nil }
+        return path
     }
 
     public var oauthAccessToken: String? {
