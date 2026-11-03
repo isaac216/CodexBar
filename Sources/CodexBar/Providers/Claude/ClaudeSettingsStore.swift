@@ -100,6 +100,29 @@ extension SettingsStore {
 }
 
 extension SettingsStore {
+    /// Returns the folder a Claude token account signs in to, creating
+    /// `~/.config/codexbar/claude-accounts/<account UUID>` (0700) when the account has none, and stores its
+    /// normalized path back on the account so sign-in and the usage probe use the same `CLAUDE_CONFIG_DIR`.
+    @discardableResult
+    func prepareClaudeAccountConfigDirectory(
+        accountID: UUID,
+        homeDirectory: URL = FileManager.default.homeDirectoryForCurrentUser,
+        fileManager: FileManager = .default) throws -> String
+    {
+        guard let account = self.tokenAccounts(for: .claude).first(where: { $0.id == accountID }) else {
+            throw ClaudeAccountConfigDirectoryError.accountNotFound
+        }
+        let directory = try ClaudeAccountConfigDirectory.prepare(
+            existing: account.claudeConfigDirectory,
+            accountID: accountID,
+            homeDirectory: homeDirectory,
+            fileManager: fileManager)
+        if account.claudeConfigDirectory != directory {
+            self.updateTokenAccount(provider: .claude, accountID: accountID, claudeConfigDirectory: .some(directory))
+        }
+        return directory
+    }
+
     func claudeSettingsSnapshot(tokenOverride: TokenAccountOverride?) -> ProviderSettingsSnapshot
     .ClaudeProviderSettings {
         let account = self.selectedClaudeTokenAccount(tokenOverride: tokenOverride)
@@ -108,13 +131,15 @@ extension SettingsStore {
             usageDataSource: self.claudeSnapshotUsageDataSource(
                 routing: routing,
                 hasSelectedAccount: account != nil),
-            webExtrasEnabled: self.claudeWebExtrasEnabled,
+            // A config-directory account reads only its own Claude CLI; browser enrichment would mix sessions.
+            webExtrasEnabled: routing.configDirectory == nil && self.claudeWebExtrasEnabled,
             cookieSource: self.claudeSnapshotCookieSource(tokenOverride: tokenOverride, routing: routing),
             manualCookieHeader: self.claudeSnapshotCookieHeader(
                 routing: routing,
                 hasSelectedAccount: account != nil),
             organizationID: account?.sanitizedOrganizationID,
-            desktopCookiesEnabled: self.claudeDesktopCookiesEnabled)
+            desktopCookiesEnabled: self.claudeDesktopCookiesEnabled,
+            accountConfigDirectory: routing.configDirectory)
     }
 
     private static func claudeUsageDataSource(from source: ProviderSourceMode?) -> ClaudeUsageDataSource {
@@ -142,6 +167,8 @@ extension SettingsStore {
             ""
         case .adminAPIKey:
             ""
+        case .configDirectory:
+            ""
         case let .webCookie(header):
             header
         }
@@ -159,6 +186,8 @@ extension SettingsStore {
             .api
         case .webCookie:
             .web
+        case .configDirectory:
+            .cli
         case .none:
             .auto
         }
@@ -180,6 +209,9 @@ extension SettingsStore {
         if routing.adminAPIKey != nil {
             return .off
         }
+        if routing.configDirectory != nil {
+            return .off
+        }
         if self.tokenAccounts(for: .claude).isEmpty { return fallback }
         return .manual
     }
@@ -188,6 +220,7 @@ extension SettingsStore {
         let manualCookieHeader = account == nil ? self.claudeCookieHeader : nil
         return ClaudeCredentialRouting.resolve(
             tokenAccountToken: account?.token,
+            claudeConfigDirectory: account?.claudeConfigDirectory,
             manualCookieHeader: manualCookieHeader)
     }
 

@@ -7,6 +7,8 @@ public struct ClaudeProviderSettings: Sendable {
     public let manualCookieHeader: String?
     public let organizationID: String?
     public let desktopCookiesEnabled: Bool
+    /// Set only for a selected token account routed to its own Claude config directory (`CLAUDE_CONFIG_DIR`).
+    public let accountConfigDirectory: String?
 
     public init(
         usageDataSource: ClaudeUsageDataSource,
@@ -14,7 +16,8 @@ public struct ClaudeProviderSettings: Sendable {
         cookieSource: ProviderCookieSource,
         manualCookieHeader: String?,
         organizationID: String? = nil,
-        desktopCookiesEnabled: Bool = false)
+        desktopCookiesEnabled: Bool = false,
+        accountConfigDirectory: String? = nil)
     {
         self.usageDataSource = usageDataSource
         self.webExtrasEnabled = webExtrasEnabled
@@ -22,6 +25,7 @@ public struct ClaudeProviderSettings: Sendable {
         self.manualCookieHeader = manualCookieHeader
         self.organizationID = organizationID
         self.desktopCookiesEnabled = desktopCookiesEnabled
+        self.accountConfigDirectory = accountConfigDirectory
     }
 }
 

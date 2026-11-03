@@ -62,7 +62,7 @@ public enum ClaudeProviderDescriptor {
                     [ClaudeOAuthCredentialsStore.environmentTokenKey: accessToken]
                 case let .adminAPIKey(apiKey):
                     [ClaudeAdminAPISettingsReader.adminAPIKeyEnvironmentKey: apiKey]
-                case .none, .webCookie:
+                case .none, .webCookie, .configDirectory:
                     nil
                 }
             },
@@ -75,12 +75,20 @@ public enum ClaudeProviderDescriptor {
         authDetector: { environment, _ in
             ClaudeAdminAPISettingsReader.apiKey(environment: environment) == nil ? [] : ["api"]
         },
+        accountEnvironmentOverride: { environment, account in
+            // The account's own folder is the only Claude login its CLI probe may use.
+            guard let directory = ClaudeCredentialRouting.resolve(account: account).configDirectory else { return }
+            environment = ClaudeAccountConfigDirectory.scopedEnvironment(
+                base: environment,
+                configDirectory: directory)
+        },
         selectedAccountSourceModeResolver: { base, account, _ in
             guard let account else { return base }
-            return switch ClaudeCredentialRouting.resolve(tokenAccountToken: account.token, manualCookieHeader: nil) {
+            return switch ClaudeCredentialRouting.resolve(account: account) {
             case .adminAPIKey: .api
             case .oauth: .oauth
             case .webCookie: .web
+            case .configDirectory: .cli
             case .none: base
             }
         })
@@ -92,12 +100,14 @@ public enum ClaudeProviderDescriptor {
             let manualCookieHeader = context.account == nil ? context.config?.sanitizedCookieHeader : nil
             let routing = ClaudeCredentialRouting.resolve(
                 tokenAccountToken: context.account?.token,
+                claudeConfigDirectory: context.account?.claudeConfigDirectory,
                 manualCookieHeader: manualCookieHeader)
             let source: ClaudeUsageDataSource = if context.account != nil {
                 switch routing {
                 case .adminAPIKey: .api
                 case .oauth: .oauth
                 case .webCookie: .web
+                case .configDirectory: .cli
                 case .none: .auto
                 }
             } else if routing.adminAPIKey != nil {
@@ -107,16 +117,18 @@ public enum ClaudeProviderDescriptor {
             } else {
                 .auto
             }
-            let cookieSource: ProviderCookieSource = routing.isOAuth || routing.adminAPIKey != nil
-                ? .off
-                : context.cookieSettings(for: .claude).cookieSource
+            let cookieSource: ProviderCookieSource =
+                routing.isOAuth || routing.adminAPIKey != nil || routing.configDirectory != nil
+                    ? .off
+                    : context.cookieSettings(for: .claude).cookieSource
             return ClaudeProviderSettings(
                 usageDataSource: source,
                 webExtrasEnabled: false,
                 cookieSource: cookieSource,
                 manualCookieHeader: routing.manualCookieHeader,
                 organizationID: context.account?.sanitizedOrganizationID,
-                desktopCookiesEnabled: context.config?.claudeDesktopCookiesEnabled ?? false)
+                desktopCookiesEnabled: context.config?.claudeDesktopCookiesEnabled ?? false,
+                accountConfigDirectory: routing.configDirectory)
         })
 
     static func makeDescriptor() -> ProviderDescriptor {
@@ -301,6 +313,11 @@ public enum ClaudeProviderDescriptor {
             }
             if self.isSelectedWebCookieTokenAccount(context: context) {
                 return [ClaudeWebFetchStrategy(browserDetection: context.browserDetection)]
+            }
+            if let directory = ClaudeAccountConfigDirectoryFetchStrategy.selectedAccountDirectory(context: context) {
+                return [ClaudeAccountConfigDirectoryFetchStrategy(
+                    configDirectory: directory,
+                    browserDetection: context.browserDetection)]
             }
             // A selected account is an authority boundary. Missing or malformed selected credentials must never
             // fall through to an ambient CLI, browser session, or global API key and be labeled as that account.

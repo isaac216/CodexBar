@@ -91,6 +91,8 @@ public struct ClaudeStatusProbe: Sendable {
     #if DEBUG
     public typealias FetchOverride = @Sendable (String, TimeInterval, Bool) async throws -> ClaudeStatusSnapshot
     @TaskLocal static var fetchOverride: FetchOverride?
+    /// Receives the environment a probe would launch Claude with, before any fetch override runs.
+    @TaskLocal static var launchEnvironmentObserverForTesting: (@Sendable ([String: String]) -> Void)?
     /// Stands in for CodexBar's dedicated probe directory, so tests never use the real Application Support folder.
     @TaskLocal static var dedicatedProbeDirectoryOverrideForTesting: URL?
     #endif
@@ -142,6 +144,7 @@ public struct ClaudeStatusProbe: Sendable {
         let keepAlive = Self.shouldKeepCLISessionAlive(requested: self.keepCLISessionsAlive)
         let accountScope = ClaudeAccountProfile.sessionScope(environment: self.environment)
         #if DEBUG
+        Self.launchEnvironmentObserverForTesting?(ClaudeCLISession.launchEnvironment(baseEnv: self.environment))
         if let override = Self.fetchOverride {
             return try await override(resolved, timeout, keepAlive)
         }

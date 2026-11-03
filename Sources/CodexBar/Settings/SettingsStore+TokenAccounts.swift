@@ -72,7 +72,7 @@ extension SettingsStore {
     {
         guard TokenAccountSupportCatalog.support(for: provider) != nil else { return }
         let trimmedToken = token.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedToken.isEmpty else { return }
+        guard !trimmedToken.isEmpty || Self.allowsTokenAccountWithoutCredential(provider: provider) else { return }
         let trimmedLabel = label.trimmingCharacters(in: .whitespacesAndNewlines)
         let existing = self.tokenAccountsData(for: provider)
         let accounts = existing?.accounts ?? []
@@ -87,7 +87,7 @@ extension SettingsStore {
             usageScope: Self.normalizedConfigField(usageScope),
             organizationID: Self.normalizedConfigField(organizationID),
             workspaceID: Self.normalizedConfigField(workspaceID),
-            claudeConfigDirectory: Self.normalizedConfigField(claudeConfigDirectory))
+            claudeConfigDirectory: Self.normalizedClaudeConfigDirectory(claudeConfigDirectory))
         let updated = ProviderTokenAccountData(
             version: existing?.version ?? 1,
             accounts: accounts + [account],
@@ -140,7 +140,7 @@ extension SettingsStore {
             usageScope: usageScope.map(Self.normalizedConfigField) ?? existing.usageScope,
             organizationID: organizationID.map(Self.normalizedConfigField) ?? existing.organizationID,
             workspaceID: workspaceID.map(Self.normalizedConfigField) ?? existing.workspaceID,
-            claudeConfigDirectory: claudeConfigDirectory.map(Self.normalizedConfigField)
+            claudeConfigDirectory: claudeConfigDirectory.map(Self.normalizedClaudeConfigDirectory)
                 ?? existing.claudeConfigDirectory,
             seatCreditEntitlement: seatCreditEntitlement.map(Self.normalizedConfigField)
                 ?? existing.seatCreditEntitlement,
@@ -168,6 +168,18 @@ extension SettingsStore {
                 "provider": provider.rawValue,
                 "count": "\(updated.accounts.count)",
             ])
+    }
+
+    /// Provider-specific by design: a Claude account can start without a pasted credential and sign in through the
+    /// browser into its own config directory.
+    nonisolated static func allowsTokenAccountWithoutCredential(provider: UsageProvider) -> Bool {
+        provider == .claude
+    }
+
+    /// Claude Code keys its credential to the exact `CLAUDE_CONFIG_DIR` string, so the account stores one canonical
+    /// absolute spelling. Values that are not absolute paths keep their trimmed text (and never route to the CLI).
+    nonisolated static func normalizedClaudeConfigDirectory(_ raw: String?) -> String? {
+        ClaudeAccountConfigDirectory.normalizedPath(raw) ?? self.normalizedConfigField(raw)
     }
 
     func moveTokenAccount(provider: UsageProvider, accountID: UUID, to destination: Int) {
