@@ -312,7 +312,46 @@ without default, claude-swap, or Pi history. Selecting a directory declares that
 CodexBar does not infer ownership or detect mixed/copied history beyond existing scanner deduplication. A missing or
 unreadable history directory leaves its estimate unavailable. Clear the mapping to restore the existing combined
 view; unmapped accounts and claude-swap retain their current behavior. The optional `claudeConfigDirectory` field
-is stored on the token account in the config file and does not change quota fetching or credential resolution.
+is stored on the token account in the config file. For an account with a pasted credential it does not change quota
+fetching or credential resolution; an account without one uses the directory for its own sign-in (below).
+
+### Browser sign-in for token accounts (Claude config directory)
+
+A Claude token account can sign in to its own Claude subscription in the browser instead of pasting a `sessionKey`.
+Several subscriptions (different emails) can then be shown side by side.
+
+1. In Settings → Providers → Claude, set Claude cookies to **Manual**, enter a label, leave the credential empty,
+   and choose **Add**. `codexbar` config files may also hold such an account (`"token": ""`).
+2. Choose **Sign in with Browser…** on that account. Without a config directory, CodexBar creates
+   `~/.config/codexbar/claude-accounts/<account UUID>/` (permissions `0700`) and stores it on the account. It then runs
+   `claude auth login --claudeai` with `CLAUDE_CONFIG_DIR` set to that folder, so Claude Code opens the browser and
+   stores the login for that folder only.
+3. With Menu → Multi-account layout set to **Stacked**, every refresh fetches each token account; two such accounts
+   show their session and weekly quotas as separate cards.
+
+Routing and isolation:
+
+- A token account whose credential field is blank and whose `claudeConfigDirectory` is an absolute folder routes to
+  the CLI PTY probe (usage source `cli`, cookies off, no Web extras) regardless of the global usage source. A pasted
+  credential keeps its existing route (OAuth, Admin API, or `sessionKey`), and the default Claude Code locations
+  (`~` and `~/.claude`) are refused as account folders.
+- The probe runs exactly as described under CLI PTY below, with `CLAUDE_CONFIG_DIR=<folder>`. It removes the
+  `CLAUDE_SECURESTORAGE_CONFIG_DIR`, `CLAUDE_CODE_OAUTH_TOKEN`, CodexBar OAuth-token, and `ANTHROPIC_*` overrides
+  from the child environment.
+- CodexBar never reads the default `Claude Code-credentials` Keychain item, `~/.claude/.credentials.json`, CodexBar's
+  Claude OAuth cache, or browser cookies for these accounts, and never falls back to the default login or another
+  source. Claude Code reads and refreshes the folder's credential itself; CodexBar writes no credential.
+- Claude Code names the macOS Keychain item after a hash of the literal `CLAUDE_CONFIG_DIR` string, so a symlink or a
+  trailing slash would select a different credential. CodexBar stores the directory as a normalized absolute path
+  (`~` expanded, `.`/`..` and trailing slashes removed, symbolic links resolved) and passes that same string to the
+  sign-in and to every probe.
+- Workspace trust for the dedicated `ClaudeProbe` directory is answered inside Claude's own UI. With
+  `CLAUDE_CONFIG_DIR` set, Claude Code records it in `<folder>/.claude.json`; `~/.claude.json` is untouched.
+- A missing folder, a folder whose `.claude.json` shows no signed-in account, or a Claude CLI authentication error
+  surfaces as an error that asks for **Sign in with Browser…** again. Other probe failures (timeouts, rate limits)
+  keep their usual messages.
+- The menu's **Sign in with Claude Code…** / **Switch Account…** actions are unchanged and still sign in the default
+  Claude Code login without `CLAUDE_CONFIG_DIR`.
 
 - Multi-account manual tokens: add entries to `~/.codexbar/config.json` (`tokenAccounts`) and set Claude cookies to
   Manual. The menu can show all accounts stacked or a switcher bar (Preferences → Advanced → Display).
