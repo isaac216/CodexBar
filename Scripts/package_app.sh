@@ -548,6 +548,12 @@ build_widget_extension() {
   echo "$appex"
 }
 
+# CODEXBAR_SKIP_WIDGET=1 packages the app without the CodexBarWidget extension, the only part that needs
+# xcodebuild. Desktop widgets are then unavailable; the default still builds and embeds the extension.
+should_package_widget_extension() {
+  [[ "${CODEXBAR_SKIP_WIDGET:-0}" != "1" ]]
+}
+
 install_widget_extension() {
   local src_appex
   src_appex="$(build_widget_extension)"
@@ -566,8 +572,12 @@ strip_release_binary "$APP/Contents/Helpers/CodexBarCLI"
 # Watchdog helper: ensures `claude` probes die when CodexBar crashes/gets killed.
 install_binary "CodexBarClaudeWatchdog" "$APP/Contents/Helpers/CodexBarClaudeWatchdog"
 strip_release_binary "$APP/Contents/Helpers/CodexBarClaudeWatchdog"
-install_widget_extension
-strip_release_binary "$APP/Contents/PlugIns/CodexBarWidget.appex/Contents/MacOS/CodexBarWidget"
+if should_package_widget_extension; then
+  install_widget_extension
+  strip_release_binary "$APP/Contents/PlugIns/CodexBarWidget.appex/Contents/MacOS/CodexBarWidget"
+else
+  echo "Skipping CodexBarWidget extension (CODEXBAR_SKIP_WIDGET=1); desktop widgets are not packaged." >&2
+fi
 
 swiftpm_bin_path "${ARCH_LIST[0]}" PREFERRED_BUILD_DIR
 
