@@ -65,7 +65,8 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate {
         selection: PreferencesSelection,
         managedCodexAccountCoordinator: ManagedCodexAccountCoordinator,
         codexAccountPromotionCoordinator: CodexAccountPromotionCoordinator,
-        runProviderLoginFlow: @escaping @MainActor (UsageProvider) async -> Void)
+        runProviderLoginFlow: @escaping @MainActor (UsageProvider) async -> Void,
+        runClaudeAccountLoginFlow: @escaping @MainActor (UUID) async -> Void = { _ in })
     {
         self.init(selection: selection) {
             let rootView = PreferencesView(
@@ -76,7 +77,8 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate {
                 selection: selection,
                 managedCodexAccountCoordinator: managedCodexAccountCoordinator,
                 codexAccountPromotionCoordinator: codexAccountPromotionCoordinator,
-                runProviderLoginFlow: runProviderLoginFlow)
+                runProviderLoginFlow: runProviderLoginFlow,
+                runClaudeAccountLoginFlow: runClaudeAccountLoginFlow)
             let hostingController = NSHostingController(rootView: rootView)
             let window = NSWindow(
                 contentRect: NSRect(

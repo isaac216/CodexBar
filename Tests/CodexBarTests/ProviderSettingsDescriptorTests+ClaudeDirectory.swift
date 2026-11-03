@@ -30,6 +30,24 @@ extension ProviderSettingsDescriptorTests {
         directory.wrappedValue = nil
         #expect(settings.selectedTokenAccount(for: .claude)?.claudeConfigDirectory == nil)
         #expect(pane._test_tokenAccountDescriptor(for: .zai)?.claudeConfigDirectory == nil)
+        // Only Claude offers browser sign-in and credential-less accounts.
+        #expect(descriptor.signInWithBrowser != nil)
+        #expect(descriptor.allowsAccountWithoutCredential)
+        #expect(pane._test_tokenAccountDescriptor(for: .zai)?.signInWithBrowser == nil)
+        #expect(pane._test_tokenAccountDescriptor(for: .zai)?.allowsAccountWithoutCredential == false)
+        #expect(ProviderSettingsTokenAccountsRowView.isAddDisabled(
+            label: "Work",
+            token: " ",
+            showsTeamModeControls: false,
+            teamMode: false,
+            teamContext: (organizationID: "", projectID: "")))
+        #expect(!ProviderSettingsTokenAccountsRowView.isAddDisabled(
+            label: "Work",
+            token: " ",
+            showsTeamModeControls: false,
+            teamMode: false,
+            teamContext: (organizationID: "", projectID: ""),
+            allowsEmptyToken: true))
 
         let root = try CostUsageTestEnvironment()
         defer { root.cleanup() }

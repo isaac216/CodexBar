@@ -2787,3 +2787,14 @@
 "Tripo is rate limiting requests. Try again later." = "Tripo가 요청 빈도를 제한하고 있습니다. 나중에 다시 시도하세요.";
 "Tripo request failed. Try refreshing later." = "Tripo 요청에 실패했습니다. 나중에 다시 새로 고침하세요.";
 "Tripo returned an unrecognized response. Update CodexBar and try again." = "Tripo가 알 수 없는 응답을 반환했습니다. CodexBar를 업데이트하고 다시 시도하세요.";
+"Sign in with Browser…" = "Sign in with Browser…";
+"Waiting for the browser sign-in…" = "Waiting for the browser sign-in…";
+"Signs this account in with claude auth login in its own Claude config directory." = "Signs this account in with claude auth login in its own Claude config directory.";
+"Leave the credential empty to add an account you sign in to with the browser." = "Leave the credential empty to add an account you sign in to with the browser.";
+"Could not prepare the Claude account folder" = "Could not prepare the Claude account folder";
+"The Claude config directory must be an absolute folder path." = "The Claude config directory must be an absolute folder path.";
+"The Claude config directory points to a file, not a folder." = "The Claude config directory points to a file, not a folder.";
+"Choose a separate folder for this account; the default Claude Code folder belongs to your own login." = "Choose a separate folder for this account; the default Claude Code folder belongs to your own login.";
+"This Claude account was removed." = "This Claude account was removed.";
+"This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude.";
+"This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude.";

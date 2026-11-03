@@ -244,6 +244,7 @@ struct ProviderSettingsTokenAccountsRowView: View {
     @State private var editingAccountID: UUID?
     @State private var editLabel = ""
     @State private var editToken = ""
+    @State private var signingInAccountID: UUID?
 
     var body: some View {
         Section {
@@ -319,6 +320,12 @@ struct ProviderSettingsTokenAccountsRowView: View {
                         if let directory = self.descriptor.claudeConfigDirectory {
                             TokenAccountDirectoryPicker(path: directory(account.id))
                         }
+                        // A pasted credential keeps its own route, so browser sign-in is offered only without one.
+                        if let signIn = self.descriptor.signInWithBrowser,
+                           account.token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                        {
+                            self.browserSignInRow(account: account, signIn: signIn)
+                        }
                     }
                 }
             }
@@ -342,7 +349,9 @@ struct ProviderSettingsTokenAccountsRowView: View {
                         Button(L("Add")) {
                             let label = self.newLabel.trimmingCharacters(in: .whitespacesAndNewlines)
                             let token = self.newToken.trimmingCharacters(in: .whitespacesAndNewlines)
-                            guard !label.isEmpty, !token.isEmpty else { return }
+                            guard !label.isEmpty,
+                                  !token.isEmpty || self.descriptor.allowsAccountWithoutCredential
+                            else { return }
                             let orgID = self.descriptor.showsOrganizationField
                                 ? self.newOrgID.trimmingCharacters(in: .whitespacesAndNewlines)
                                 : ""
@@ -378,7 +387,14 @@ struct ProviderSettingsTokenAccountsRowView: View {
                             token: self.newToken,
                             showsTeamModeControls: self.descriptor.showsTeamModeControls,
                             teamMode: self.newTeamMode,
-                            teamContext: (organizationID: self.newOrgID, projectID: self.newProjectID)))
+                            teamContext: (organizationID: self.newOrgID, projectID: self.newProjectID),
+                            allowsEmptyToken: self.descriptor.allowsAccountWithoutCredential))
+                    }
+                    if self.descriptor.signInWithBrowser != nil {
+                        Text(L("Leave the credential empty to add an account you sign in to with the browser."))
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                     if self.descriptor.claudeConfigDirectory != nil {
                         TokenAccountDirectoryPicker(path: self.$newClaudeConfigDirectory)
@@ -475,6 +491,32 @@ struct ProviderSettingsTokenAccountsRowView: View {
         }
         .textFieldStyle(.roundedBorder)
         .padding(.leading, 24)
+    }
+
+    private func browserSignInRow(
+        account: ProviderTokenAccount,
+        signIn: @escaping (_ accountID: UUID) async -> Void) -> some View
+    {
+        HStack(spacing: 8) {
+            Button(L("Sign in with Browser…")) {
+                self.signingInAccountID = account.id
+                Task { @MainActor in
+                    await signIn(account.id)
+                    self.signingInAccountID = nil
+                }
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+            .disabled(self.signingInAccountID != nil)
+            .help(L("Signs this account in with claude auth login in its own Claude config directory."))
+            if self.signingInAccountID == account.id {
+                ProgressView()
+                    .controlSize(.small)
+                Text(L("Waiting for the browser sign-in…"))
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+        }
     }
 
     private func isActive(index: Int, accountCount: Int) -> Bool {
@@ -599,11 +641,12 @@ struct ProviderSettingsTokenAccountsRowView: View {
         token: String,
         showsTeamModeControls: Bool,
         teamMode: Bool,
-        teamContext: (organizationID: String, projectID: String)) -> Bool
+        teamContext: (organizationID: String, projectID: String),
+        allowsEmptyToken: Bool = false) -> Bool
     {
         let label = label.trimmingCharacters(in: .whitespacesAndNewlines)
         let token = token.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !label.isEmpty, !token.isEmpty else { return true }
+        guard !label.isEmpty, !token.isEmpty || allowsEmptyToken else { return true }
         guard showsTeamModeControls, teamMode else { return false }
         return teamContext.organizationID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
             teamContext.projectID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty

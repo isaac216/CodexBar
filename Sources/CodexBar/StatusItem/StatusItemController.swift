@@ -10,6 +10,7 @@ protocol StatusItemControlling: AnyObject {
     func setSettingsOpenHandler(_ handler: @escaping @MainActor (SettingsPane?) -> Void)
     func openMenuFromShortcut()
     func runLoginFlowFromSettings(provider: UsageProvider) async
+    func runClaudeAccountLoginFlowFromSettings(accountID: UUID) async
     func celebrationOriginPoint(for provider: UsageProvider?) -> CGPoint?
     func trimRebuildableCachesForMemoryPressure() -> MemoryPressureCacheTrimSummary
     #if DEBUG
@@ -19,6 +20,8 @@ protocol StatusItemControlling: AnyObject {
 }
 
 extension StatusItemControlling {
+    func runClaudeAccountLoginFlowFromSettings(accountID _: UUID) async {}
+
     func celebrationOriginPoint(for provider: UsageProvider?) -> CGPoint? {
         nil
     }

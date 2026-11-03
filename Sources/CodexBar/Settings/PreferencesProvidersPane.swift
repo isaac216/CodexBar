@@ -22,6 +22,7 @@ struct ProvidersPane: View {
     let codexAccountPromotionCoordinator: CodexAccountPromotionCoordinator
     let codexAmbientLoginRunner: any CodexAmbientLoginRunning
     let runProviderLoginFlow: @MainActor (UsageProvider) async -> Void
+    let runClaudeAccountLoginFlow: @MainActor (UUID) async -> Void
     @State private var expandedErrors: Set<UsageProvider> = []
     @State private var settingsStatusTextByID: [String: String] = [:]
     @State private var settingsLastAppActiveRunAtByID: [String: Date] = [:]
@@ -37,7 +38,8 @@ struct ProvidersPane: View {
         managedCodexAccountCoordinator: ManagedCodexAccountCoordinator = ManagedCodexAccountCoordinator(),
         codexAccountPromotionCoordinator: CodexAccountPromotionCoordinator? = nil,
         codexAmbientLoginRunner: any CodexAmbientLoginRunning = DefaultCodexAmbientLoginRunner(),
-        runProviderLoginFlow: @escaping @MainActor (UsageProvider) async -> Void = { _ in })
+        runProviderLoginFlow: @escaping @MainActor (UsageProvider) async -> Void = { _ in },
+        runClaudeAccountLoginFlow: @escaping @MainActor (UUID) async -> Void = { _ in })
     {
         self.provider = provider
         self.settings = settings
@@ -50,6 +52,7 @@ struct ProvidersPane: View {
                 managedAccountCoordinator: managedCodexAccountCoordinator)
         self.codexAmbientLoginRunner = codexAmbientLoginRunner
         self.runProviderLoginFlow = runProviderLoginFlow
+        self.runClaudeAccountLoginFlow = runClaudeAccountLoginFlow
     }
 
     var body: some View {
@@ -524,8 +527,14 @@ struct ProvidersPane: View {
         descriptor.moveAccount = { accountID, destination in
             self.settings.moveTokenAccount(provider: provider, accountID: accountID, to: destination)
         }
-        // Provider-specific by design: only Claude accounts declare local transcript ownership.
+        // Provider-specific by design: only Claude accounts declare local transcript ownership and can sign in
+        // through the browser into their own config directory.
         if provider == .claude {
+            descriptor.allowsAccountWithoutCredential = SettingsStore.allowsTokenAccountWithoutCredential(
+                provider: provider)
+            descriptor.signInWithBrowser = { accountID in
+                await self.runClaudeAccountLoginFlow(accountID)
+            }
             descriptor.claudeConfigDirectory = { accountID in
                 Binding(
                     get: { self.settings.tokenAccounts(for: provider)

@@ -2821,3 +2821,14 @@
 "Tripo is rate limiting requests. Try again later." = "Tripo membatasi frekuensi permintaan. Coba lagi nanti.";
 "Tripo request failed. Try refreshing later." = "Permintaan Tripo gagal. Coba segarkan lagi nanti.";
 "Tripo returned an unrecognized response. Update CodexBar and try again." = "Tripo mengembalikan respons yang tidak dikenali. Perbarui CodexBar dan coba lagi.";
+"Sign in with Browser…" = "Sign in with Browser…";
+"Waiting for the browser sign-in…" = "Waiting for the browser sign-in…";
+"Signs this account in with claude auth login in its own Claude config directory." = "Signs this account in with claude auth login in its own Claude config directory.";
+"Leave the credential empty to add an account you sign in to with the browser." = "Leave the credential empty to add an account you sign in to with the browser.";
+"Could not prepare the Claude account folder" = "Could not prepare the Claude account folder";
+"The Claude config directory must be an absolute folder path." = "The Claude config directory must be an absolute folder path.";
+"The Claude config directory points to a file, not a folder." = "The Claude config directory points to a file, not a folder.";
+"Choose a separate folder for this account; the default Claude Code folder belongs to your own login." = "Choose a separate folder for this account; the default Claude Code folder belongs to your own login.";
+"This Claude account was removed." = "This Claude account was removed.";
+"This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude.";
+"This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude.";
