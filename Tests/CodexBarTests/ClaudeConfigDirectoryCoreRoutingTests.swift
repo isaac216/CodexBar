@@ -1,4 +1,3 @@
-import CodexBarCore
 import Foundation
 import Testing
 @testable import CodexBarCLI
@@ -74,8 +73,10 @@ struct ClaudeConfigDirectoryCoreRoutingTests {
             return ClaudeConfigDirectoryFixture.usageStatusSnapshot()
         }
 
+        let launchObserver: @Sendable ([String: String]) -> Void = { probeCalls.record($0) }
+
         let outcome = await KeychainCacheStore.withOperationRecorderForTesting(cacheRecorder) {
-            await ClaudeStatusProbe.$launchEnvironmentObserverForTesting.withValue({ probeCalls.record($0) }) {
+            await ClaudeStatusProbe.$launchEnvironmentObserverForTesting.withValue(launchObserver) {
                 await ClaudeStatusProbe.withFetchOverrideForTesting(fetchOverride) {
                     await ProviderInteractionContext.$current.withValue(.background) {
                         await ProviderDescriptorRegistry.descriptor(for: .claude).fetchOutcome(context: routed.context)
@@ -139,7 +140,7 @@ struct ClaudeConfigDirectoryCoreRoutingTests {
             ClaudeStatusProbeError.authenticationFailed("OAuth token has expired. Please run /login"))
         #expect(mapped as? ClaudeAccountConfigDirectoryError == .signInRequired)
         let timeout = ClaudeAccountConfigDirectoryFetchStrategy.accountFacingError(ClaudeStatusProbeError.timedOut)
-        #expect(timeout as? ClaudeStatusProbeError != nil)
+        #expect(timeout is ClaudeStatusProbeError)
     }
 
     @Test
@@ -211,9 +212,9 @@ struct ClaudeConfigDirectoryCoreRoutingTests {
 
         // The probe environment for an account stored with any spelling carries the normalized folder, the same
         // string the sign-in environment receives.
-        let signIn = ClaudeAccountConfigDirectory.scopedEnvironment(
+        let signIn = try ClaudeAccountConfigDirectory.scopedEnvironment(
             base: fixture.ambientEnvironment,
-            configDirectory: try ClaudeAccountConfigDirectory.prepare(
+            configDirectory: ClaudeAccountConfigDirectory.prepare(
                 existing: link + "/",
                 accountID: UUID(),
                 homeDirectory: home))
@@ -265,7 +266,7 @@ struct ClaudeConfigDirectoryCoreRoutingTests {
     }
 
     @Test
-    func `sign-in environment points claude auth login at the account folder only`() async throws {
+    func `sign-in environment points claude auth login at the account folder only`() throws {
         let fixture = try ClaudeConfigDirectoryFixture()
         defer { fixture.remove() }
         let script = fixture.root.appendingPathComponent("bin/claude-env")

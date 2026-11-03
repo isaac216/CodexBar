@@ -71,8 +71,8 @@ struct ClaudeLoginFlowTests {
             #expect(didLogin)
         }
 
-        let environment = try #require(captured.environments.first ?? nil)
         #expect(captured.environments.count == 1)
+        let environment = try #require(captured.environments.compactMap(\.self).first)
         #expect(environment[ClaudeConfigPaths.configDirectoryEnvironmentKey] == directory)
         #expect(environment[ClaudeConfigPaths.secureStorageDirectoryEnvironmentKey] == nil)
         #expect(environment["CLAUDE_CODE_OAUTH_TOKEN"] == nil)
