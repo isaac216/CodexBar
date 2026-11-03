@@ -101,12 +101,18 @@ Accepted Claude token-account input shapes today:
 - raw OAuth access token with `sk-ant-oat...` prefix,
 - `Bearer sk-ant-oat...` input,
 - raw session key,
-- full cookie header.
+- full cookie header,
+- an empty credential with a `claudeConfigDirectory` (browser sign-in through `CLAUDE_CONFIG_DIR`).
 
 Current routing rules:
 
 - OAuth-token-shaped inputs are not treated as cookies.
 - Cookie/header-shaped inputs are any value that already contains `Cookie:` or `=`.
+- A blank credential plus an absolute `claudeConfigDirectory` other than `~` or `~/.claude` routes to
+  `configDirectory`: usage source `cli`, cookies `.off`, no Web extras, and `CLAUDE_CONFIG_DIR` set to the normalized
+  folder in the fetch environment (CLI overrides such as `CLAUDE_SECURESTORAGE_CONFIG_DIR` and
+  `CLAUDE_CODE_OAUTH_TOKEN` removed). The planner returns only `ClaudeAccountConfigDirectoryFetchStrategy` (id
+  `claude.cli`), which never falls back. A pasted credential always wins over the directory.
 - App-side Claude snapshot behavior:
   - OAuth token account keeps the usage source setting as-is, disables cookie mode (`.off`), clears the manual cookie
     header, and relies on environment-token injection.
