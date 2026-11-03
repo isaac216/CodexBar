@@ -79,6 +79,30 @@ struct ClaudeLoginRunnerTests {
         #expect(result.output.contains("login failed"))
     }
 
+    @Test
+    func `account sign-in environment reaches claude auth login`() async throws {
+        let fixture = try self.makeFixture(script: """
+        #!/bin/sh
+        printf 'dir=%s|secure=%s\\n' "${CLAUDE_CONFIG_DIR-unset}" "${CLAUDE_SECURESTORAGE_CONFIG_DIR-unset}"
+        printf 'Successfully logged in\\n'
+        """)
+        defer { fixture.remove() }
+        var base = fixture.environment
+        base["CLAUDE_SECURESTORAGE_CONFIG_DIR"] = "/fixtures/other-account"
+
+        let result = await ClaudeLoginRunner.run(
+            timeout: 10,
+            binary: fixture.executable.path,
+            environment: ClaudeLoginRunner.environment(configDirectory: "/fixtures/claude-work", base: base),
+            onPhaseChange: { _ in })
+
+        guard case .success = result.outcome else {
+            Issue.record("Expected success, got \(String(describing: result.outcome))")
+            return
+        }
+        #expect(result.output.contains("dir=/fixtures/claude-work|secure=unset"))
+    }
+
     private func makeFixture(script: String) throws -> Fixture {
         let root = FileManager.default.temporaryDirectory
             .appendingPathComponent("codexbar-claude-login-\(UUID().uuidString)", isDirectory: true)

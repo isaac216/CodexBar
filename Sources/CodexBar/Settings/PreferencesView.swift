@@ -58,6 +58,7 @@ struct PreferencesView: View {
     let managedCodexAccountCoordinator: ManagedCodexAccountCoordinator
     let codexAccountPromotionCoordinator: CodexAccountPromotionCoordinator
     let runProviderLoginFlow: @MainActor (UsageProvider) async -> Void
+    let runClaudeAccountLoginFlow: @MainActor (UUID) async -> Void
     @Environment(\.colorScheme) private var colorScheme
     @AppStorage(SettingsPane.sidebarWidthDefaultsKey) private var sidebarWidth: Double = SettingsPane.sidebarWidth
     /// Measured titlebar height used to size the detail titlebar cover. Read from the window rather
@@ -79,7 +80,8 @@ struct PreferencesView: View {
         selection: PreferencesSelection,
         managedCodexAccountCoordinator: ManagedCodexAccountCoordinator = ManagedCodexAccountCoordinator(),
         codexAccountPromotionCoordinator: CodexAccountPromotionCoordinator? = nil,
-        runProviderLoginFlow: @escaping @MainActor (UsageProvider) async -> Void = { _ in })
+        runProviderLoginFlow: @escaping @MainActor (UsageProvider) async -> Void = { _ in },
+        runClaudeAccountLoginFlow: @escaping @MainActor (UUID) async -> Void = { _ in })
     {
         self.settings = settings
         self.store = store
@@ -93,6 +95,7 @@ struct PreferencesView: View {
                 usageStore: store,
                 managedAccountCoordinator: managedCodexAccountCoordinator)
         self.runProviderLoginFlow = runProviderLoginFlow
+        self.runClaudeAccountLoginFlow = runClaudeAccountLoginFlow
     }
 
     var body: some View {
@@ -271,7 +274,8 @@ struct PreferencesView: View {
                     store: self.store,
                     managedCodexAccountCoordinator: self.managedCodexAccountCoordinator,
                     codexAccountPromotionCoordinator: self.codexAccountPromotionCoordinator,
-                    runProviderLoginFlow: self.runProviderLoginFlow)
+                    runProviderLoginFlow: self.runProviderLoginFlow,
+                    runClaudeAccountLoginFlow: self.runClaudeAccountLoginFlow)
                     .id(instanceID)
             }
         }

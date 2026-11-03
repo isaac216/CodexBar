@@ -25,6 +25,15 @@ struct ClaudeLoginRunner {
         let authLink: String?
     }
 
+    /// Environment for `claude auth login` inside a Claude token account's own config directory. The usage probe
+    /// receives the same `CLAUDE_CONFIG_DIR` string, so Claude stores and later reads one credential.
+    static func environment(
+        configDirectory: String,
+        base: [String: String] = ProcessInfo.processInfo.environment) -> [String: String]
+    {
+        ClaudeAccountConfigDirectory.scopedEnvironment(base: base, configDirectory: configDirectory)
+    }
+
     static func run(
         timeout: TimeInterval = 120,
         binary: String = ClaudeProviderDescriptor.descriptor.cli.name,

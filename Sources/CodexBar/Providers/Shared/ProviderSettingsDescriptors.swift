@@ -241,6 +241,10 @@ struct ProviderSettingsTokenAccountsDescriptor: Identifiable {
     let openConfigFile: () -> Void
     let reloadFromDisk: () -> Void
     var claudeConfigDirectory: ((UUID) -> Binding<String?>)?
+    /// Claude only: runs `claude auth login` with `CLAUDE_CONFIG_DIR` set to the account's own folder.
+    var signInWithBrowser: ((_ accountID: UUID) async -> Void)?
+    /// Lets the add row create an account before it has a credential, for a later browser sign-in.
+    var allowsAccountWithoutCredential = false
     var editAccount: ((_ accountID: UUID, _ label: String, _ token: String?) -> Void)?
     var moveAccount: ((_ accountID: UUID, _ destination: Int) -> Void)?
 }

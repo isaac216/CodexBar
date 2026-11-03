@@ -2771,3 +2771,14 @@
 "Leave blank to use the default name." = "留空以使用預設名稱。";
 "Rewards" = "獎勵";
 "Reward expiry" = "獎勵到期日期";
+"Sign in with Browser…" = "用瀏覽器登入…";
+"Waiting for the browser sign-in…" = "等待瀏覽器完成登入…";
+"Signs this account in with claude auth login in its own Claude config directory." = "在這個帳號自己的 Claude 設定目錄裡執行 claude auth login 登入。";
+"Leave the credential empty to add an account you sign in to with the browser." = "憑證留空即可新增帳號，之後用瀏覽器登入。";
+"Could not prepare the Claude account folder" = "無法建立 Claude 帳號資料夾";
+"The Claude config directory must be an absolute folder path." = "Claude 設定目錄必須是資料夾的絕對路徑。";
+"The Claude config directory points to a file, not a folder." = "Claude 設定目錄指向的是檔案，不是資料夾。";
+"Choose a separate folder for this account; the default Claude Code folder belongs to your own login." = "請替這個帳號選另一個資料夾；Claude Code 的預設資料夾屬於你自己的登入。";
+"This Claude account was removed." = "這個 Claude 帳號已被移除。";
+"This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude." = "找不到這個 Claude 帳號的資料夾。請到「設定 → 提供者 → Claude」按「用瀏覽器登入…」。";
+"This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude." = "這個 Claude 帳號未登入。請到「設定 → 提供者 → Claude」按「用瀏覽器登入…」。";

@@ -444,6 +444,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             runProviderLoginFlow: { [weak self] provider in
                 guard let self else { return }
                 await self.runProviderLoginFlow(provider)
+            },
+            runClaudeAccountLoginFlow: { [weak self] accountID in
+                guard let self else { return }
+                await self.runClaudeAccountLoginFlow(accountID: accountID)
             })
         if self.pendingUpdateSettingsOpen {
             self.pendingUpdateSettingsOpen = false
@@ -562,6 +566,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         self.ensureStatusController()
         guard let statusController else { return }
         await statusController.runLoginFlowFromSettings(provider: provider)
+    }
+
+    func runClaudeAccountLoginFlow(accountID: UUID) async {
+        self.ensureStatusController()
+        guard let statusController else { return }
+        await statusController.runClaudeAccountLoginFlowFromSettings(accountID: accountID)
     }
 
     func openSettings(pane: SettingsPane?) {

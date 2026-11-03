@@ -2792,3 +2792,14 @@
 "Leave blank to use the default name." = "Laissez ce champ vide pour utiliser le nom par défaut.";
 "Rewards" = "Récompenses";
 "Reward expiry" = "Expiration des récompenses";
+"Sign in with Browser…" = "Sign in with Browser…";
+"Waiting for the browser sign-in…" = "Waiting for the browser sign-in…";
+"Signs this account in with claude auth login in its own Claude config directory." = "Signs this account in with claude auth login in its own Claude config directory.";
+"Leave the credential empty to add an account you sign in to with the browser." = "Leave the credential empty to add an account you sign in to with the browser.";
+"Could not prepare the Claude account folder" = "Could not prepare the Claude account folder";
+"The Claude config directory must be an absolute folder path." = "The Claude config directory must be an absolute folder path.";
+"The Claude config directory points to a file, not a folder." = "The Claude config directory points to a file, not a folder.";
+"Choose a separate folder for this account; the default Claude Code folder belongs to your own login." = "Choose a separate folder for this account; the default Claude Code folder belongs to your own login.";
+"This Claude account was removed." = "This Claude account was removed.";
+"This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude.";
+"This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude.";
