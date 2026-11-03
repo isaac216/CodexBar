@@ -2832,3 +2832,14 @@
 "This Claude account was removed." = "This Claude account was removed.";
 "This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude.";
 "This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude.";
+"Sign in with Browser…" = "Masuk dengan Peramban…";
+"Waiting for the browser sign-in…" = "Menunggu proses masuk di peramban…";
+"Signs this account in with claude auth login in its own Claude config directory." = "Memasukkan akun ini dengan claude auth login di direktori konfigurasi Claude miliknya sendiri.";
+"Leave the credential empty to add an account you sign in to with the browser." = "Biarkan kredensial kosong untuk menambahkan akun yang Anda masuki melalui peramban.";
+"Could not prepare the Claude account folder" = "Tidak dapat menyiapkan folder akun Claude";
+"The Claude config directory must be an absolute folder path." = "Direktori konfigurasi Claude harus berupa jalur folder absolut.";
+"The Claude config directory points to a file, not a folder." = "Direktori konfigurasi Claude menunjuk ke file, bukan folder.";
+"Choose a separate folder for this account; the default Claude Code folder belongs to your own login." = "Pilih folder terpisah untuk akun ini; folder default Claude Code adalah milik login Anda sendiri.";
+"This Claude account was removed." = "Akun Claude ini telah dihapus.";
+"This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude." = "Folder akun Claude ini tidak ditemukan. Gunakan “Masuk dengan Peramban…” di Pengaturan → Penyedia → Claude.";
+"This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude." = "Akun Claude ini sudah keluar. Gunakan “Masuk dengan Peramban…” di Pengaturan → Penyedia → Claude.";

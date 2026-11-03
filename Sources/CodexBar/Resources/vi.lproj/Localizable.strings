@@ -2831,3 +2831,14 @@
 "This Claude account was removed." = "This Claude account was removed.";
 "This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude.";
 "This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude.";
+"Sign in with Browser…" = "Đăng nhập bằng trình duyệt…";
+"Waiting for the browser sign-in…" = "Đang chờ đăng nhập trên trình duyệt…";
+"Signs this account in with claude auth login in its own Claude config directory." = "Đăng nhập tài khoản này bằng claude auth login trong thư mục cấu hình Claude riêng của nó.";
+"Leave the credential empty to add an account you sign in to with the browser." = "Để trống thông tin xác thực để thêm tài khoản mà bạn đăng nhập bằng trình duyệt.";
+"Could not prepare the Claude account folder" = "Không thể chuẩn bị thư mục tài khoản Claude";
+"The Claude config directory must be an absolute folder path." = "Thư mục cấu hình Claude phải là đường dẫn thư mục tuyệt đối.";
+"The Claude config directory points to a file, not a folder." = "Thư mục cấu hình Claude trỏ tới một tệp, không phải thư mục.";
+"Choose a separate folder for this account; the default Claude Code folder belongs to your own login." = "Hãy chọn một thư mục riêng cho tài khoản này; thư mục mặc định của Claude Code thuộc về phiên đăng nhập của chính bạn.";
+"This Claude account was removed." = "Tài khoản Claude này đã bị xóa.";
+"This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude." = "Không tìm thấy thư mục của tài khoản Claude này. Hãy dùng “Đăng nhập bằng trình duyệt…” trong Cài đặt → Nhà cung cấp → Claude.";
+"This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude." = "Tài khoản Claude này đã đăng xuất. Hãy dùng “Đăng nhập bằng trình duyệt…” trong Cài đặt → Nhà cung cấp → Claude.";

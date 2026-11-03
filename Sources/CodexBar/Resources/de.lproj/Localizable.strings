@@ -2828,3 +2828,14 @@
 "This Claude account was removed." = "This Claude account was removed.";
 "This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude.";
 "This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude.";
+"Sign in with Browser…" = "Mit Browser anmelden…";
+"Waiting for the browser sign-in…" = "Warte auf die Anmeldung im Browser…";
+"Signs this account in with claude auth login in its own Claude config directory." = "Meldet dieses Konto mit claude auth login in seinem eigenen Claude-Konfigurationsordner an.";
+"Leave the credential empty to add an account you sign in to with the browser." = "Lass die Zugangsdaten leer, um ein Konto hinzuzufügen, bei dem du dich im Browser anmeldest.";
+"Could not prepare the Claude account folder" = "Der Ordner für das Claude-Konto konnte nicht vorbereitet werden";
+"The Claude config directory must be an absolute folder path." = "Der Claude-Konfigurationsordner muss ein absoluter Ordnerpfad sein.";
+"The Claude config directory points to a file, not a folder." = "Der Claude-Konfigurationsordner verweist auf eine Datei, nicht auf einen Ordner.";
+"Choose a separate folder for this account; the default Claude Code folder belongs to your own login." = "Wähle für dieses Konto einen eigenen Ordner; der Standardordner von Claude Code gehört zu deiner eigenen Anmeldung.";
+"This Claude account was removed." = "Dieses Claude-Konto wurde entfernt.";
+"This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude." = "Der Ordner dieses Claude-Kontos fehlt. Verwende „Mit Browser anmelden…“ unter Einstellungen → Anbieter → Claude.";
+"This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude." = "Dieses Claude-Konto ist abgemeldet. Verwende „Mit Browser anmelden…“ unter Einstellungen → Anbieter → Claude.";

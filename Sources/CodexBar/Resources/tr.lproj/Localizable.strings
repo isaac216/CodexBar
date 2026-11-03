@@ -2833,3 +2833,14 @@
 "This Claude account was removed." = "This Claude account was removed.";
 "This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude.";
 "This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude.";
+"Sign in with Browser…" = "Tarayıcıyla giriş yap…";
+"Waiting for the browser sign-in…" = "Tarayıcıda giriş bekleniyor…";
+"Signs this account in with claude auth login in its own Claude config directory." = "Bu hesapta kendi Claude yapılandırma dizininde claude auth login ile oturum açar.";
+"Leave the credential empty to add an account you sign in to with the browser." = "Tarayıcıyla giriş yapacağınız bir hesap eklemek için kimlik bilgisini boş bırakın.";
+"Could not prepare the Claude account folder" = "Claude hesap klasörü hazırlanamadı";
+"The Claude config directory must be an absolute folder path." = "Claude yapılandırma dizini mutlak bir klasör yolu olmalıdır.";
+"The Claude config directory points to a file, not a folder." = "Claude yapılandırma dizini bir klasörü değil, bir dosyayı gösteriyor.";
+"Choose a separate folder for this account; the default Claude Code folder belongs to your own login." = "Bu hesap için ayrı bir klasör seçin; varsayılan Claude Code klasörü sizin kendi oturumunuza aittir.";
+"This Claude account was removed." = "Bu Claude hesabı kaldırıldı.";
+"This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude." = "Bu Claude hesabının klasörü bulunamadı. Ayarlar → Sağlayıcılar → Claude bölümünde “Tarayıcıyla giriş yap…” seçeneğini kullanın.";
+"This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude." = "Bu Claude hesabının oturumu kapalı. Ayarlar → Sağlayıcılar → Claude bölümünde “Tarayıcıyla giriş yap…” seçeneğini kullanın.";

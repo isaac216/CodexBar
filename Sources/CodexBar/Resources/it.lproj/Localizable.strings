@@ -2834,3 +2834,14 @@
 "This Claude account was removed." = "This Claude account was removed.";
 "This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude.";
 "This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude.";
+"Sign in with Browser…" = "Accedi con il browser…";
+"Waiting for the browser sign-in…" = "In attesa dell’accesso nel browser…";
+"Signs this account in with claude auth login in its own Claude config directory." = "Accede a questo account con claude auth login nella sua cartella di configurazione di Claude.";
+"Leave the credential empty to add an account you sign in to with the browser." = "Lascia vuota la credenziale per aggiungere un account a cui accedi con il browser.";
+"Could not prepare the Claude account folder" = "Impossibile preparare la cartella dell’account Claude";
+"The Claude config directory must be an absolute folder path." = "La cartella di configurazione di Claude deve essere un percorso di cartella assoluto.";
+"The Claude config directory points to a file, not a folder." = "La cartella di configurazione di Claude punta a un file, non a una cartella.";
+"Choose a separate folder for this account; the default Claude Code folder belongs to your own login." = "Scegli una cartella separata per questo account; la cartella predefinita di Claude Code appartiene al tuo accesso personale.";
+"This Claude account was removed." = "Questo account Claude è stato rimosso.";
+"This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude." = "Manca la cartella di questo account Claude. Usa «Accedi con il browser…» in Impostazioni → Provider → Claude.";
+"This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude." = "Questo account Claude non ha eseguito l’accesso. Usa «Accedi con il browser…» in Impostazioni → Provider → Claude.";

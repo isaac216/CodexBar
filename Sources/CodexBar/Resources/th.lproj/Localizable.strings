@@ -2832,3 +2832,14 @@
 "This Claude account was removed." = "This Claude account was removed.";
 "This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude.";
 "This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude.";
+"Sign in with Browser…" = "ลงชื่อเข้าใช้ด้วยเบราว์เซอร์…";
+"Waiting for the browser sign-in…" = "กำลังรอการลงชื่อเข้าใช้ในเบราว์เซอร์…";
+"Signs this account in with claude auth login in its own Claude config directory." = "ลงชื่อเข้าใช้บัญชีนี้ด้วย claude auth login ในโฟลเดอร์การตั้งค่า Claude ของบัญชีนี้เอง";
+"Leave the credential empty to add an account you sign in to with the browser." = "เว้นข้อมูลรับรองว่างไว้เพื่อเพิ่มบัญชีที่คุณลงชื่อเข้าใช้ผ่านเบราว์เซอร์";
+"Could not prepare the Claude account folder" = "ไม่สามารถเตรียมโฟลเดอร์บัญชี Claude ได้";
+"The Claude config directory must be an absolute folder path." = "โฟลเดอร์การตั้งค่า Claude ต้องเป็นพาธแบบสัมบูรณ์ของโฟลเดอร์";
+"The Claude config directory points to a file, not a folder." = "โฟลเดอร์การตั้งค่า Claude ชี้ไปที่ไฟล์ ไม่ใช่โฟลเดอร์";
+"Choose a separate folder for this account; the default Claude Code folder belongs to your own login." = "เลือกโฟลเดอร์แยกสำหรับบัญชีนี้ โฟลเดอร์เริ่มต้นของ Claude Code เป็นของการเข้าสู่ระบบของคุณเอง";
+"This Claude account was removed." = "นำบัญชี Claude นี้ออกแล้ว";
+"This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude." = "ไม่พบโฟลเดอร์ของบัญชี Claude นี้ ใช้ “ลงชื่อเข้าใช้ด้วยเบราว์เซอร์…” ใน การตั้งค่า → ผู้ให้บริการ → Claude";
+"This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude." = "บัญชี Claude นี้ออกจากระบบแล้ว ใช้ “ลงชื่อเข้าใช้ด้วยเบราว์เซอร์…” ใน การตั้งค่า → ผู้ให้บริการ → Claude";

@@ -2834,3 +2834,14 @@
 "This Claude account was removed." = "This Claude account was removed.";
 "This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude.";
 "This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude.";
+"Sign in with Browser…" = "ورود با مرورگر…";
+"Waiting for the browser sign-in…" = "در انتظار ورود در مرورگر…";
+"Signs this account in with claude auth login in its own Claude config directory." = "این حساب را با claude auth login در پوشهٔ پیکربندی Claude مخصوص خودش وارد می‌کند.";
+"Leave the credential empty to add an account you sign in to with the browser." = "برای افزودن حسابی که با مرورگر وارد آن می‌شوید، اعتبارنامه را خالی بگذارید.";
+"Could not prepare the Claude account folder" = "آماده‌سازی پوشهٔ حساب Claude ممکن نشد";
+"The Claude config directory must be an absolute folder path." = "پوشهٔ پیکربندی Claude باید مسیر مطلق یک پوشه باشد.";
+"The Claude config directory points to a file, not a folder." = "پوشهٔ پیکربندی Claude به یک فایل اشاره می‌کند، نه یک پوشه.";
+"Choose a separate folder for this account; the default Claude Code folder belongs to your own login." = "برای این حساب پوشهٔ جداگانه‌ای انتخاب کنید؛ پوشهٔ پیش‌فرض Claude Code متعلق به ورود خود شماست.";
+"This Claude account was removed." = "این حساب Claude حذف شد.";
+"This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude." = "پوشهٔ این حساب Claude پیدا نشد. از «ورود با مرورگر…» در تنظیمات → ارائه‌دهندگان → Claude استفاده کنید.";
+"This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude." = "از این حساب Claude خارج شده‌اید. از «ورود با مرورگر…» در تنظیمات → ارائه‌دهندگان → Claude استفاده کنید.";

@@ -2822,3 +2822,14 @@
 "This Claude account was removed." = "This Claude account was removed.";
 "This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude.";
 "This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude.";
+"Sign in with Browser…" = "用浏览器登录…";
+"Waiting for the browser sign-in…" = "正在等待浏览器完成登录…";
+"Signs this account in with claude auth login in its own Claude config directory." = "在这个账户自己的 Claude 配置目录中运行 claude auth login 登录。";
+"Leave the credential empty to add an account you sign in to with the browser." = "凭据留空即可添加账户，之后用浏览器登录。";
+"Could not prepare the Claude account folder" = "无法创建 Claude 账户文件夹";
+"The Claude config directory must be an absolute folder path." = "Claude 配置目录必须是文件夹的绝对路径。";
+"The Claude config directory points to a file, not a folder." = "Claude 配置目录指向的是文件，而不是文件夹。";
+"Choose a separate folder for this account; the default Claude Code folder belongs to your own login." = "请为这个账户选择单独的文件夹；Claude Code 的默认文件夹属于你自己的登录。";
+"This Claude account was removed." = "这个 Claude 账户已被移除。";
+"This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude." = "找不到这个 Claude 账户的文件夹。请在“设置 → 提供商 → Claude”中点按“用浏览器登录…”。";
+"This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude." = "这个 Claude 账户未登录。请在“设置 → 提供商 → Claude”中点按“用浏览器登录…”。";

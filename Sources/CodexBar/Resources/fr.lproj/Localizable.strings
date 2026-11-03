@@ -2829,3 +2829,14 @@
 "This Claude account was removed." = "This Claude account was removed.";
 "This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude.";
 "This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude.";
+"Sign in with Browser…" = "Se connecter avec le navigateur…";
+"Waiting for the browser sign-in…" = "En attente de la connexion dans le navigateur…";
+"Signs this account in with claude auth login in its own Claude config directory." = "Connecte ce compte avec claude auth login dans son propre dossier de configuration de Claude.";
+"Leave the credential empty to add an account you sign in to with the browser." = "Laissez les identifiants vides pour ajouter un compte auquel vous vous connectez avec le navigateur.";
+"Could not prepare the Claude account folder" = "Impossible de préparer le dossier du compte Claude";
+"The Claude config directory must be an absolute folder path." = "Le dossier de configuration de Claude doit être un chemin de dossier absolu.";
+"The Claude config directory points to a file, not a folder." = "Le dossier de configuration de Claude pointe vers un fichier, pas vers un dossier.";
+"Choose a separate folder for this account; the default Claude Code folder belongs to your own login." = "Choisissez un dossier distinct pour ce compte ; le dossier par défaut de Claude Code appartient à votre propre connexion.";
+"This Claude account was removed." = "Ce compte Claude a été supprimé.";
+"This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude." = "Le dossier de ce compte Claude est introuvable. Utilisez « Se connecter avec le navigateur… » dans Réglages → Fournisseurs → Claude.";
+"This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude." = "Ce compte Claude est déconnecté. Utilisez « Se connecter avec le navigateur… » dans Réglages → Fournisseurs → Claude.";

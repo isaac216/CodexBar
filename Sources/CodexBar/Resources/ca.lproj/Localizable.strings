@@ -2832,3 +2832,14 @@
 "This Claude account was removed." = "This Claude account was removed.";
 "This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude.";
 "This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude.";
+"Sign in with Browser…" = "Inicieu la sessió amb el navegador…";
+"Waiting for the browser sign-in…" = "S’està esperant l’inici de sessió al navegador…";
+"Signs this account in with claude auth login in its own Claude config directory." = "Inicia la sessió d’aquest compte amb claude auth login al seu propi directori de configuració de Claude.";
+"Leave the credential empty to add an account you sign in to with the browser." = "Deixeu la credencial buida per afegir un compte en què inicieu la sessió amb el navegador.";
+"Could not prepare the Claude account folder" = "No s’ha pogut preparar la carpeta del compte de Claude";
+"The Claude config directory must be an absolute folder path." = "El directori de configuració de Claude ha de ser un camí de carpeta absolut.";
+"The Claude config directory points to a file, not a folder." = "El directori de configuració de Claude apunta a un fitxer, no a una carpeta.";
+"Choose a separate folder for this account; the default Claude Code folder belongs to your own login." = "Trieu una carpeta diferent per a aquest compte; la carpeta per defecte de Claude Code pertany al vostre propi inici de sessió.";
+"This Claude account was removed." = "Aquest compte de Claude s’ha eliminat.";
+"This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude." = "Falta la carpeta d’aquest compte de Claude. Feu servir «Inicieu la sessió amb el navegador…» a Configuració → Proveïdors → Claude.";
+"This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude." = "Aquest compte de Claude no té la sessió iniciada. Feu servir «Inicieu la sessió amb el navegador…» a Configuració → Proveïdors → Claude.";

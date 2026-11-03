@@ -2833,3 +2833,14 @@
 "This Claude account was removed." = "This Claude account was removed.";
 "This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude.";
 "This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude." = "This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude.";
+"Sign in with Browser…" = "Zaloguj się przez przeglądarkę…";
+"Waiting for the browser sign-in…" = "Oczekiwanie na logowanie w przeglądarce…";
+"Signs this account in with claude auth login in its own Claude config directory." = "Loguje to konto poleceniem claude auth login we własnym katalogu konfiguracji Claude.";
+"Leave the credential empty to add an account you sign in to with the browser." = "Pozostaw dane uwierzytelniające puste, aby dodać konto, do którego logujesz się przez przeglądarkę.";
+"Could not prepare the Claude account folder" = "Nie udało się przygotować folderu konta Claude";
+"The Claude config directory must be an absolute folder path." = "Katalog konfiguracji Claude musi być bezwzględną ścieżką folderu.";
+"The Claude config directory points to a file, not a folder." = "Katalog konfiguracji Claude wskazuje plik, a nie folder.";
+"Choose a separate folder for this account; the default Claude Code folder belongs to your own login." = "Wybierz osobny folder dla tego konta; domyślny folder Claude Code należy do Twojego własnego logowania.";
+"This Claude account was removed." = "To konto Claude zostało usunięte.";
+"This Claude account's folder is missing. Use Sign in with Browser… in Settings → Providers → Claude." = "Brak folderu tego konta Claude. Użyj „Zaloguj się przez przeglądarkę…” w Ustawienia → Dostawcy → Claude.";
+"This Claude account is signed out. Use Sign in with Browser… in Settings → Providers → Claude." = "To konto Claude jest wylogowane. Użyj „Zaloguj się przez przeglądarkę…” w Ustawienia → Dostawcy → Claude.";
