@@ -22,6 +22,73 @@ struct ClaudeTokenAccountCostTests {
     }
 
     @Test
+    func `browser sign-in folders estimate costs from the ambient history`() async throws {
+        let env = try CostUsageTestEnvironment()
+        defer { env.cleanup() }
+        let now = Date()
+        let ambient = env.root.appendingPathComponent("ambient")
+        let projects = ambient.appendingPathComponent("projects/sample")
+        try FileManager.default.createDirectory(at: projects, withIntermediateDirectories: true)
+        let row: [String: Any] = [
+            "type": "assistant", "timestamp": env.isoString(for: now), "requestId": "request-ambient",
+            "message": [
+                "id": "message-ambient",
+                "model": "claude-sonnet-4-20250514",
+                "usage": ["input_tokens": 100, "output_tokens": 10],
+            ],
+        ]
+        try env.jsonl([row]).write(
+            to: projects.appendingPathComponent("session.jsonl"),
+            atomically: true,
+            encoding: .utf8)
+        #expect(try ModelsDevCache.save(
+            catalog: CostUsageClaudeResolverTests.simpleCatalog(["claude-sonnet-4-20250514": 3]),
+            fetchedAt: now,
+            cacheRoot: env.cacheRoot))
+        let settings = testSettingsStore(
+            suiteName: "ClaudeTokenAccountCostTests-browser",
+            userDefaults: InMemoryUserDefaults(),
+            config: testConfigWithAllProvidersDisabled(),
+            keychainAccessPolicy: .init(setDisabled: { _ in }, isExplicitlyDisabled: { false }))
+        enableTestProviders([.claude], settings: settings)
+        settings.costUsageEnabled = true
+        let generated = ClaudeAccountConfigDirectory.defaultURL(accountID: UUID(), homeDirectory: env.root).path
+        settings.addTokenAccount(provider: .claude, label: "Browser", token: "", claudeConfigDirectory: generated)
+        let account = try #require(settings.selectedTokenAccount(for: .claude))
+        let store = UsageStore(
+            fetcher: UsageFetcher(environment: [:]),
+            browserDetection: BrowserDetection(cacheTTL: 0),
+            costUsageFetcher: CostUsageFetcher(scannerOptions: .init(
+                claudeProjectsRoots: [ambient.appendingPathComponent("projects")],
+                cacheRoot: env.cacheRoot)),
+            settings: settings,
+            startupBehavior: .testing,
+            environmentBase: ["HOME": env.root.path],
+            widgetSnapshotURL: env.root.appendingPathComponent("widget.json"),
+            widgetTimelineReloader: {})
+
+        // The generated folder only runs CodexBar's probe, so the estimate keeps the ambient history.
+        #expect(store.claudeTokenCostConfigDirectory == nil)
+        #expect(store.tokenCostScope(for: .claude).signature == "claude")
+        let result = try await store.loadTokenUsageSnapshot(
+            provider: .claude,
+            force: false,
+            now: now,
+            codexHomePath: nil,
+            historyDays: 30,
+            includePiSessions: false)
+        #expect(result.snapshot.last30DaysTokens == 110)
+
+        // A folder the user picked stays that account's history root.
+        settings.updateTokenAccount(
+            provider: .claude,
+            accountID: account.id,
+            claudeConfigDirectory: .some(env.root.appendingPathComponent("claude-work").path))
+        let picked = try #require(settings.selectedTokenAccount(for: .claude)?.claudeConfigDirectory)
+        #expect(store.claudeTokenCostConfigDirectory == picked)
+    }
+
+    @Test
     func `mapped costs follow the active directory and never fall back to other history`() async throws {
         let env = try CostUsageTestEnvironment()
         defer { env.cleanup() }

@@ -144,6 +144,23 @@ struct ClaudeConfigDirectoryCoreRoutingTests {
     }
 
     @Test
+    func `only folders generated for browser sign-in count as generated account directories`() {
+        let home = URL(fileURLWithPath: "/Users/example", isDirectory: true)
+        let generated = ClaudeAccountConfigDirectory.defaultURL(accountID: UUID(), homeDirectory: home).path
+        #expect(ClaudeAccountConfigDirectory.isGeneratedAccountDirectory(generated))
+        #expect(ClaudeAccountConfigDirectory.isGeneratedAccountDirectory(generated + "/"))
+        for path in [
+            home.path + "/.claude",
+            home.path + "/claude-work",
+            home.path + "/.config/codexbar/claude-accounts/work",
+            home.path + "/.config/claude-accounts/" + UUID().uuidString,
+            generated + "/projects",
+        ] {
+            #expect(!ClaudeAccountConfigDirectory.isGeneratedAccountDirectory(path))
+        }
+    }
+
+    @Test
     func `routing keeps pasted credentials and rejects unusable folders`() throws {
         let fixture = try ClaudeConfigDirectoryFixture()
         defer { fixture.remove() }

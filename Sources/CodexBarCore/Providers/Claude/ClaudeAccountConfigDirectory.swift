@@ -56,6 +56,17 @@ public enum ClaudeAccountConfigDirectory {
         }
     }
 
+    /// True for a folder CodexBar generated for the browser sign-in (`…/codexbar/claude-accounts/<account UUID>`).
+    /// Only CodexBar's usage probe runs Claude there, so it holds none of the user's own Claude Code history.
+    /// A folder the user picked keeps its meaning as that account's history root.
+    public static func isGeneratedAccountDirectory(_ path: String) -> Bool {
+        let url = URL(fileURLWithPath: path, isDirectory: true).standardizedFileURL
+        let accounts = url.deletingLastPathComponent()
+        return UUID(uuidString: url.lastPathComponent) != nil
+            && accounts.lastPathComponent == self.accountsDirectoryName
+            && accounts.deletingLastPathComponent().lastPathComponent == "codexbar"
+    }
+
     /// `~` expanded and `.`/`..` and trailing slashes removed, without touching the filesystem.
     private static func standardizedAbsolutePath(_ raw: String?, homeDirectory: URL) -> String? {
         guard let trimmed = raw?.trimmingCharacters(in: .whitespacesAndNewlines), !trimmed.isEmpty else {
