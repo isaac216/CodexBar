@@ -284,8 +284,10 @@ extension ClaudeStatusProbe {
         let hasOpusLabel = !weeklyModels.isDisjoint(with: opusModels)
 
         // Weekly-only plans render no session row, so the first percentage would be the weekly one; only
-        // scrape by order when a (possibly garbled) session label is on screen.
-        let hasSessionLabel = labelContext.normalizedLines.contains { $0.contains("session") }
+        // scrape by order when a (possibly garbled, e.g. "Curretsession") "Current session" label is on screen.
+        // Claude Code 2.1.310 also prints a "Session" cost header and "sessions on this machine only" in the
+        // same panel; those are not the quota label.
+        let hasSessionLabel = labelContext.normalizedLines.contains { $0.hasPrefix("cur") && $0.contains("session") }
         if sessionPct == nil, hasSessionLabel {
             let ordered = self.allPercents(usagePanelText)
             if ordered.indices.contains(0) {
