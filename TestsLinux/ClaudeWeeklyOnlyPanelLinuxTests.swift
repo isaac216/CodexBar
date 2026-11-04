@@ -15,13 +15,14 @@ struct ClaudeWeeklyOnlyPanelLinuxTests {
     Usage:                 0 input, 0 output, 0 cache read, 0 cache write
     """
 
-    private static let insightsAndFable = """
-    What's contributing to your limits usage?
-    Approximate · sessions on this machine only
-    Scanning local sessions…
+    /// Quota rows end before the insights report; rows after its header belong to the report.
+    private static let fableAndInsights = """
     Current week (Fable)
                                                        0% used
     Resets Nov 9 at 9am (America/New_York)
+    What's contributing to your limits usage?
+    Approximate · sessions on this machine only
+    Scanning local sessions…
     Usage credits
     Usage credits are off · /usage-credits to turn them on
     """
@@ -32,7 +33,7 @@ struct ClaudeWeeklyOnlyPanelLinuxTests {
         Current week (all models)
         █████████████████████████████████████████████████▌ 99% used
         Resets Nov 9 at 9am (America/New_York)
-        """ + "\n" + Self.insightsAndFable + "\n" + """
+        """ + "\n" + Self.fableAndInsights + "\n" + """
         You've used 99% of your weekly limit · resets Nov 9 at 9am (America/New_York)
         """
 
@@ -53,7 +54,7 @@ struct ClaudeWeeklyOnlyPanelLinuxTests {
         Current week (all models)
         ▌ 1% used
         Resets Nov 9 at 9am (America/New_York)
-        """ + "\n" + Self.insightsAndFable
+        """ + "\n" + Self.fableAndInsights
 
         let snap = try ClaudeStatusProbe.parse(text: sample)
         #expect(snap.sessionPercentLeft == 97)
@@ -70,7 +71,7 @@ struct ClaudeWeeklyOnlyPanelLinuxTests {
         Current week (all models)
         █▌ 3% used
         Resets Nov 9 at 9am (America/New_York)
-        """ + "\n" + Self.insightsAndFable
+        """ + "\n" + Self.fableAndInsights
 
         let snap = try ClaudeStatusProbe.parse(text: sample)
         #expect(snap.sessionPercentLeft == 85)
