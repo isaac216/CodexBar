@@ -6,16 +6,28 @@ name: Fork build (Claude browser sign-in)
 on:
   push:
     branches: [isaac/build-app]
+  workflow_call:
+    inputs:
+      source_ref:
+        description: Branch to build (fork-upstream-sync.yml passes its candidate branch)
+        type: string
+        required: true
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: Branch to build
+        required: false
+        default: isaac/claude-config-dir-login
 
 permissions:
   contents: read
 
 concurrency:
-  group: fork-build-${{ github.ref }}
+  group: fork-build-${{ inputs.source_ref || github.ref }}
   cancel-in-progress: true
 
 env:
-  SOURCE_REF: isaac/claude-config-dir-login
+  SOURCE_REF: ${{ inputs.source_ref || 'isaac/claude-config-dir-login' }}
 
 jobs:
   lint:

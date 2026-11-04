@@ -1,0 +1,208 @@
+# Fork-only workflow for isaac216/CodexBar; it is not part of any upstream pull request.
+# Twice a month, moves the fork's own commits onto the newest upstream release that is at least
+# LAG_DAYS old, builds it with fork-build-app.yml, and opens an issue with the result and a report of
+# sensitive upstream changes to read before installing. Nothing is installed on the Mac from here.
+# Jobs holding a write token only run git and grep; upstream scripts run in the read-only build.
+name: Fork upstream sync (lagged release)
+
+on:
+  schedule:
+    - cron: "0 19 1,15 * *" # 03:00 Asia/Taipei on the 2nd and 16th
+  workflow_dispatch:
+    inputs:
+      lag_days:
+        description: Minimum age in days of the upstream release to follow
+        required: false
+        default: "14"
+      force_tag:
+        description: Process this upstream tag even if it is not newer than the current base (testing)
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fork-upstream-sync
+  cancel-in-progress: false
+
+env:
+  UPSTREAM_REPO: steipete/CodexBar
+  CUSTOM_BRANCH: isaac/claude-config-dir-login
+  LAG_DAYS: ${{ inputs.lag_days || '14' }}
+  FORCE_TAG: ${{ inputs.force_tag || '' }}
+
+jobs:
+  rebase:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    outputs:
+      status: ${{ steps.pick.outputs.status }}
+      base: ${{ steps.pick.outputs.base }}
+      target: ${{ steps.pick.outputs.target }}
+      candidate: ${{ steps.pick.outputs.candidate }}
+      rebase_status: ${{ steps.move.outputs.rebase_status }}
+      report_b64: ${{ steps.report.outputs.report_b64 }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.CUSTOM_BRANCH }}
+          fetch-depth: 0
+
+      - name: Pick the upstream release to follow
+        id: pick
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git remote add upstream "https://github.com/${UPSTREAM_REPO}.git"
+          git fetch --quiet --tags upstream
+          base=$(git describe --tags --abbrev=0 --match 'v[0-9]*' HEAD)
+          if [[ -n "$FORCE_TAG" ]]; then
+            target="$FORCE_TAG"
+          else
+            cutoff=$(date -u -d "-${LAG_DAYS} days" +%Y-%m-%dT%H:%M:%SZ)
+            target=$(gh api "repos/${UPSTREAM_REPO}/releases?per_page=100" \
+              --jq "[.[] | select(.draft == false and .prerelease == false and .published_at <= \"${cutoff}\")]
+                    | sort_by(.published_at) | last | .tag_name // \"\"")
+          fi
+          echo "base=$base" >> "$GITHUB_OUTPUT"
+          echo "target=$target" >> "$GITHUB_OUTPUT"
+          echo "base $base, target $target (lag ${LAG_DAYS} days, force '${FORCE_TAG}')"
+          candidate="isaac/candidate-${target}"
+          if [[ -z "$target" ]]; then
+            echo "status=none" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          git rev-parse --verify --quiet "refs/tags/${target}" > /dev/null
+          if [[ -z "$FORCE_TAG" ]] && git merge-base --is-ancestor "$target" "$base"; then
+            echo "Already on $base, which contains $target."
+            echo "status=up-to-date" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          if git ls-remote --exit-code --heads origin "$candidate" > /dev/null; then
+            echo "$candidate already exists; it was handled in an earlier run."
+            echo "status=done-before" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          echo "candidate=$candidate" >> "$GITHUB_OUTPUT"
+          echo "status=new" >> "$GITHUB_OUTPUT"
+
+      - name: Move the fork commits onto the release
+        id: move
+        if: steps.pick.outputs.status == 'new'
+        env:
+          BASE: ${{ steps.pick.outputs.base }}
+          TARGET: ${{ steps.pick.outputs.target }}
+          CANDIDATE: ${{ steps.pick.outputs.candidate }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          {
+            echo "## Fork commits before (${BASE}..${CUSTOM_BRANCH})"
+            echo '```'
+            git log --reverse --format='%h %s' "${BASE}..HEAD"
+            echo '```'
+          } > rebase-report.md
+          git switch --quiet -c "$CANDIDATE"
+          if git rebase --onto "$TARGET" "$BASE"; then
+            echo "rebase_status=ok" >> "$GITHUB_OUTPUT"
+            {
+              echo "## Fork commits after (${TARGET}..${CANDIDATE})"
+              echo "Commits upstream already contains are dropped by the rebase."
+              echo '```'
+              git log --reverse --format='%h %s' "${TARGET}..HEAD"
+              echo '```'
+            } >> rebase-report.md
+            git push --quiet origin "$CANDIDATE"
+          else
+            {
+              echo "## Rebase stopped with conflicts"
+              echo '```'
+              git status --short
+              echo '```'
+            } >> rebase-report.md
+            git rebase --abort
+            echo "rebase_status=conflict" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Report sensitive upstream changes
+        id: report
+        if: steps.pick.outputs.status == 'new'
+        env:
+          BASE: ${{ steps.pick.outputs.base }}
+          TARGET: ${{ steps.pick.outputs.target }}
+        run: |
+          set -euo pipefail
+          range="${BASE}..${TARGET}"
+          sensitive='Keychain|Cookie|Credential|OAuth|Token|Secret|Password|Process|Launch|Shell|PTY|Sparkle|Updater|Entitlement|Info\.plist|Package\.(swift|resolved)|Scripts/|\.entitlements'
+          {
+            echo "## Upstream ${range}"
+            echo "- commits: $(git rev-list --count "$range"), files: $(git diff --name-only "$range" | wc -l), authors: $(git log --format='%an' "$range" | sort -u | wc -l)"
+            echo
+            echo "### Dependency pins (Package.resolved)"
+            echo '```diff'
+            git diff "$range" -- Package.resolved | grep -E '^[+-] *"(identity|version|revision)"' || echo "(unchanged)"
+            echo '```'
+            echo
+            echo "### Hosts that appear in Sources for the first time"
+            echo '```'
+            comm -13 \
+              <(git grep -hoE 'https?://[A-Za-z0-9.-]+' "$BASE" -- Sources | sort -u) \
+              <(git grep -hoE 'https?://[A-Za-z0-9.-]+' "$TARGET" -- Sources | sort -u) \
+              || true
+            echo '```'
+            echo
+            echo "### Changed files in sensitive areas"
+            echo '```'
+            git diff --stat=200 "$range" -- Sources Scripts Package.swift Package.resolved \
+              | grep -E "$sensitive" || echo "(none)"
+            echo '```'
+          } >> rebase-report.md
+          cat rebase-report.md
+          echo "report_b64=$(head -c 60000 rebase-report.md | base64 -w0)" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: rebase
+    if: needs.rebase.outputs.status == 'new' && needs.rebase.outputs.rebase_status == 'ok'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/fork-build-app.yml
+    with:
+      source_ref: ${{ needs.rebase.outputs.candidate }}
+
+  notify:
+    needs: [rebase, build]
+    if: always() && needs.rebase.outputs.status == 'new'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
+      - name: Open an issue for the owner
+        env:
+          REPORT_B64: ${{ needs.rebase.outputs.report_b64 }}
+          GH_TOKEN: ${{ github.token }}
+          TARGET: ${{ needs.rebase.outputs.target }}
+          CANDIDATE: ${{ needs.rebase.outputs.candidate }}
+          REBASE: ${{ needs.rebase.outputs.rebase_status }}
+          BUILD: ${{ needs.build.result }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          if [[ "$REBASE" != "ok" ]]; then
+            title="Upstream ${TARGET}: fork commits do not apply, needs a manual rebase"
+          elif [[ "$BUILD" == "success" ]]; then
+            title="Upstream ${TARGET}: candidate built (${CANDIDATE}), review before installing"
+          else
+            title="Upstream ${TARGET}: candidate build or tests failed (${BUILD})"
+          fi
+          {
+            echo "Run: ${RUN_URL}"
+            echo "Candidate branch: \`${CANDIDATE}\` (the installed app's branch \`${CUSTOM_BRANCH}\` is unchanged)."
+            echo "App artifact: \`CodexBar-app\` on the run above."
+            echo
+            printf '%s' "$REPORT_B64" | base64 -d
+          } > issue.md
+          gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body-file issue.md \
+            --assignee "$GITHUB_REPOSITORY_OWNER"
