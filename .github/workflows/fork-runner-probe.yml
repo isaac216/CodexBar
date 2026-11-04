@@ -1,0 +1,25 @@
+# Fork-only workflow for isaac216/CodexBar; it is not part of any upstream pull request.
+# Asks for each macOS runner label once and prints the image, to tell an account-side runner
+# problem from a label-side one when fork-build-app.yml jobs are "not acquired".
+name: Fork runner probe
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    strategy:
+      fail-fast: false
+      matrix:
+        label: [xcode-27, macos-26, macos-15]
+    runs-on: ${{ matrix.label }}
+    timeout-minutes: 5
+    steps:
+      - name: Describe the runner
+        run: |
+          sw_vers
+          uname -m
+          find /Applications -maxdepth 1 -name 'Xcode_*' | sort | tail -5
