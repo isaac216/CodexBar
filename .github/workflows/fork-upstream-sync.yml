@@ -2,7 +2,9 @@
 # Twice a month, moves the fork's own commits onto the newest upstream release that is at least
 # LAG_DAYS old, builds it with fork-build-app.yml, and opens an issue with the result and a report of
 # sensitive upstream changes to read before installing. Nothing is installed on the Mac from here.
-# Jobs holding a write token only run git and grep; upstream scripts run in the read-only build.
+# Newer releases whose notes mention a security fix are listed too, so a fix can be picked early.
+# Jobs holding a write token only run git, grep and the fork's own scripts; upstream scripts run in
+# the read-only build.
 name: Fork upstream sync (lagged release)
 
 on:
@@ -13,7 +15,7 @@ on:
       lag_days:
         description: Minimum age in days of the upstream release to follow
         required: false
-        default: "14"
+        default: "30"
       force_tag:
         description: Process this upstream tag even if it is not newer than the current base (testing)
         required: false
@@ -29,7 +31,7 @@ concurrency:
 env:
   UPSTREAM_REPO: steipete/CodexBar
   CUSTOM_BRANCH: isaac/claude-config-dir-login
-  LAG_DAYS: ${{ inputs.lag_days || '14' }}
+  LAG_DAYS: ${{ inputs.lag_days || '30' }}
   FORCE_TAG: ${{ inputs.force_tag || '' }}
 
 jobs:
@@ -45,11 +47,19 @@ jobs:
       candidate: ${{ steps.pick.outputs.candidate }}
       rebase_status: ${{ steps.move.outputs.rebase_status }}
       report_b64: ${{ steps.report.outputs.report_b64 }}
+      security_tags: ${{ steps.security.outputs.tags }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ env.CUSTOM_BRANCH }}
           fetch-depth: 0
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          path: fork-tools
+          sparse-checkout: .github/scripts
+          persist-credentials: false
 
       - name: Pick the upstream release to follow
         id: pick
@@ -57,6 +67,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          echo fork-tools >> .git/info/exclude
           git remote add upstream "https://github.com/${UPSTREAM_REPO}.git"
           git fetch --quiet --tags upstream
           base=$(git describe --tags --abbrev=0 --match 'v[0-9]*' HEAD)
@@ -86,6 +97,17 @@ jobs:
           fi
           echo "candidate=$candidate" >> "$GITHUB_OUTPUT"
           echo "status=new" >> "$GITHUB_OUTPUT"
+
+      - name: List newer releases with security notes
+        id: security
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REF: ${{ steps.pick.outputs.status == 'new' && steps.pick.outputs.target || steps.pick.outputs.base }}
+        run: |
+          set -euo pipefail
+          tags=$(fork-tools/.github/scripts/fork-upstream-security-notes.sh "$UPSTREAM_REPO" "$REF" | paste -sd ' ' -)
+          echo "Releases with security notes newer than ${REF}: ${tags:-none}"
+          echo "tags=$tags" >> "$GITHUB_OUTPUT"
 
       - name: Move the fork commits onto the release
         id: move
@@ -186,6 +208,7 @@ jobs:
           TARGET: ${{ needs.rebase.outputs.target }}
           CANDIDATE: ${{ needs.rebase.outputs.candidate }}
           REBASE: ${{ needs.rebase.outputs.rebase_status }}
+          SECURITY_TAGS: ${{ needs.rebase.outputs.security_tags }}
           BUILD: ${{ needs.build.result }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
@@ -202,7 +225,42 @@ jobs:
             echo "Candidate branch: \`${CANDIDATE}\` (the installed app's branch \`${CUSTOM_BRANCH}\` is unchanged)."
             echo "App artifact: \`CodexBar-app\` on the run above."
             echo
+            if [[ -n "$SECURITY_TAGS" ]]; then
+              echo "## Newer releases with security notes, not in this candidate"
+              for t in $SECURITY_TAGS; do echo "- https://github.com/${UPSTREAM_REPO}/releases/tag/${t}"; done
+              echo
+            fi
             printf '%s' "$REPORT_B64" | base64 -d
+          } > issue.md
+          gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body-file issue.md \
+            --assignee "$GITHUB_REPOSITORY_OWNER"
+
+  security-note:
+    needs: rebase
+    if: needs.rebase.outputs.status != 'new' && needs.rebase.outputs.security_tags != ''
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
+      - name: Open an issue unless the same one is already open
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAGS: ${{ needs.rebase.outputs.security_tags }}
+          BASE: ${{ needs.rebase.outputs.base }}
+        run: |
+          set -euo pipefail
+          title="Upstream security notes newer than ${BASE}: ${TAGS}"
+          open=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --limit 100 --json title --jq '.[].title')
+          if grep -qxF "$title" <<< "$open"; then
+            echo "Already open: $title"; exit 0
+          fi
+          {
+            echo "These upstream releases mention a security fix and are newer than \`${BASE}\`,"
+            echo "the base of \`${CUSTOM_BRANCH}\`. The ${LAG_DAYS}-day lag has not reached them yet;"
+            echo "read the notes and decide whether to pick the fix early."
+            echo
+            for t in $TAGS; do echo "- https://github.com/${UPSTREAM_REPO}/releases/tag/${t}"; done
           } > issue.md
           gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body-file issue.md \
             --assignee "$GITHUB_REPOSITORY_OWNER"
