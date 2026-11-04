@@ -241,5 +241,7 @@ extension UsageStore {
         else { return nil }
         return self.settings.effectiveSelectedTokenAccount(for: .claude)?.claudeConfigDirectory
             .flatMap { $0.isEmpty ? nil : $0 }
+            // A generated sign-in folder holds only CodexBar's usage probe; estimate from the ambient history.
+            .flatMap { ClaudeAccountConfigDirectory.isGeneratedAccountDirectory($0) ? nil : $0 }
     }
 }
