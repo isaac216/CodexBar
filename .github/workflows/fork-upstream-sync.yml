@@ -3,6 +3,8 @@
 # LAG_DAYS old, builds it with fork-build-app.yml, and opens an issue with the result and a report of
 # sensitive upstream changes to read before installing. Nothing is installed on the Mac from here.
 # Newer releases whose notes mention a security fix are listed too, so a fix can be picked early.
+# The replay (scripts/fork-rebase-onto.sh) merges .strings with union, drops fork commits listed in
+# scripts/fork-upstreamed.tsv once upstream has them, and reuses resolutions from scripts/rerere-cache/.
 # Jobs holding a write token only run git, grep and the fork's own scripts; upstream scripts run in
 # the read-only build.
 name: Fork upstream sync (lagged release)
@@ -127,24 +129,20 @@ jobs:
             echo '```'
           } > rebase-report.md
           git switch --quiet -c "$CANDIDATE"
-          if git rebase --onto "$TARGET" "$BASE"; then
+          # Union merge for .strings, drops from fork-upstreamed.tsv, replays from rerere-cache/.
+          if fork-tools/.github/scripts/fork-rebase-onto.sh "$BASE" "$TARGET" > "$RUNNER_TEMP/rebase-steps.md"; then
             echo "rebase_status=ok" >> "$GITHUB_OUTPUT"
             {
+              cat "$RUNNER_TEMP/rebase-steps.md"
               echo "## Fork commits after (${TARGET}..${CANDIDATE})"
-              echo "Commits upstream already contains are dropped by the rebase."
+              echo "Patch-identical commits upstream already contains are dropped by the rebase as well."
               echo '```'
               git log --reverse --format='%h %s' "${TARGET}..HEAD"
               echo '```'
             } >> rebase-report.md
             git push --quiet origin "$CANDIDATE"
           else
-            {
-              echo "## Rebase stopped with conflicts"
-              echo '```'
-              git status --short
-              echo '```'
-            } >> rebase-report.md
-            git rebase --abort
+            cat "$RUNNER_TEMP/rebase-steps.md" >> rebase-report.md
             echo "rebase_status=conflict" >> "$GITHUB_OUTPUT"
           fi
 

@@ -1,0 +1,9 @@
+# Fork-only data for fork-rebase-onto.sh; it is not part of any upstream pull request.
+# Fork commits that upstream has since merged in its own form. Once the release being followed
+# contains the upstream commit in column 1, the sync drops the fork commit whose subject is in
+# column 2 instead of replaying it. Columns are separated by a single tab; column 3 says why.
+a96e58f3019707a4f80131dd78b37b634e5c8d6a	fix(claude): hide session window for weekly-only plans	PR #4914, squash-merged upstream
+a96e58f3019707a4f80131dd78b37b634e5c8d6a	docs: note Claude weekly-only session trap	PR #4914, squash-merged upstream
+a96e58f3019707a4f80131dd78b37b634e5c8d6a	fix(claude): keep quota lane check within gatekeeper allowlist	PR #4914, squash-merged upstream
+5bebf9a05e68059eae11d5031c7239f1aa1d49ef	Only treat a Current session label as the session row on weekly-only panels	v0.84.0 passes the fork's weekly-only panel tests without it
+5bebf9a05e68059eae11d5031c7239f1aa1d49ef	Order the weekly-only test panel like Claude Code draws it	test fixture of the commit above
