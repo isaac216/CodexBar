@@ -76,6 +76,7 @@ extension UsageStore {
 
     func prepareRefreshState(for provider: UsageProvider? = nil, allowDisabled: Bool = false) {
         self.settings.recoverLegacyCredentials(for: provider, allowDisabled: allowDisabled)
+        self.followClaudeCodeActiveAccountIfChanged(refreshing: provider)
         // Provider-specific by design: Codex active-source correction reconciles managed profile filesystem state.
         guard provider == nil || provider == .codex else { return }
         _ = self.settings.persistResolvedCodexActiveSourceCorrectionIfNeeded()
